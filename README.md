@@ -1,0 +1,1 @@
+An example code of calling native DLL from Delphi application
