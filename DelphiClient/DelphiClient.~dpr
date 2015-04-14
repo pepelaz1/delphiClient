@@ -1,0 +1,52 @@
+program DelphiClient;
+
+{$APPTYPE CONSOLE}
+
+uses
+  SysUtils, Windows;
+
+type
+
+
+  EmissorRetornoDados = record
+     protocolo_sefaz: PChar;
+     url_consulta: PChar;
+     dig_val: PChar;
+     chave:  PChar;
+     det: PChar;
+  end;
+
+  EmissorRetornoErro = record
+    codigo: integer;
+    pode_reutilizar_numero: integer;
+    det: PChar;
+  end;
+
+  EmissorRetorno = record
+    situacao_operacao: integer;
+    dados: EmissorRetornoDados;
+    erro: EmissorRetornoErro;
+  end;
+
+
+var
+   h: Thandle;
+   initializar: function: Pointer ; {$IFDEF WIN32} stdcall; {$ENDIF}
+   emissor: function(ptr: Pointer; str: PChar; len: integer; output: Pointer):integer;  {$IFDEF WIN32} stdcall; {$ENDIF}
+   ptr, optr : Pointer;
+   ret: EmissorRetorno;
+   str: PChar;
+begin
+   h := LoadLibrary('ncfepack_agente.dll');
+   if h >= 32 then { success }
+   begin
+     initializar := GetProcAddress(h, 'nfce_inicializa_emissor');
+     emissor := GetProcAddress(h, 'nfce_emitir');
+
+     ptr := initializar();
+     str := 'Test string';
+     emissor(ptr, str,StrLen(str), @ret);   
+     FreeLibrary(h);
+
+   end
+end.
